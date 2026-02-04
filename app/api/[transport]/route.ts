@@ -295,4 +295,14 @@ const handler = createMcpHandler(
   }
 );
 
-export { handler as GET, handler as POST };
+export async function GET(
+  request: Request,
+  context: { params: { transport: string } }
+) {
+  if (context.params.transport === "mcp") {
+    return new Response("ok", { status: 200 });
+  }
+  return handler(request);
+}
+
+export { handler as POST };
