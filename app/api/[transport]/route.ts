@@ -27,7 +27,6 @@ const widgetHtml = readFileSync(
 const handler = createMcpHandler(
   (server) => {
     const mcpServer = server as McpServer;
-    const supabase = getSupabase();
     const publicBaseUrl = getPublicBaseUrl();
     const storageBucket = getStorageBucket();
 
@@ -76,6 +75,7 @@ const handler = createMcpHandler(
         const shareUrl = `${publicBaseUrl}/gift/${token}`;
         const createdAt = new Date().toISOString();
 
+        const supabase = getSupabase();
         const { error: giftError } = await supabase.from("gpt_gifts").insert({
           id,
           token,
@@ -156,6 +156,7 @@ const handler = createMcpHandler(
         const extension = payload.filename.split(".").pop() || "bin";
         const storagePath = `${payload.giftId}/${id}.${extension}`;
 
+        const supabase = getSupabase();
         const { data: signed, error: signedError } = await supabase.storage
           .from(storageBucket)
           .createSignedUploadUrl(storagePath, { upsert: false });
@@ -227,6 +228,7 @@ const handler = createMcpHandler(
           created_at: new Date().toISOString(),
         };
 
+        const supabase = getSupabase();
         const { error } = await supabase.from("gpt_deliveries").insert(record);
         if (error) {
           throw new Error(error.message);
@@ -256,6 +258,7 @@ const handler = createMcpHandler(
       },
       async (input) => {
         const payload = giftGetSchema.parse(input);
+        const supabase = getSupabase();
         const { data, error } = await supabase
           .from("gpt_gifts")
           .select(
