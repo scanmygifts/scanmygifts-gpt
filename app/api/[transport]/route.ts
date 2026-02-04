@@ -300,7 +300,21 @@ export async function GET(
   context: { params: { transport: string } }
 ) {
   if (context.params.transport === "mcp") {
-    return new Response("ok", { status: 200 });
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(": ok\n\n"));
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   }
   return handler(request);
 }
