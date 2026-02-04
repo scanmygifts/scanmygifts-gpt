@@ -155,7 +155,7 @@ const handler = createMcpHandler(
 
         const { data: signed, error: signedError } = await supabase.storage
           .from(storageBucket)
-          .createSignedUploadUrl(storagePath, { expiresIn: 60 * 10, upsert: false });
+          .createSignedUploadUrl(storagePath, { upsert: false });
 
         if (signedError || !signed) {
           throw new Error(signedError?.message || "Unable to create upload URL");
