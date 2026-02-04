@@ -301,7 +301,7 @@ export async function GET(
   if (context.params.transport === "mcp") {
     return new Response("ok", { status: 200 });
   }
-  return handler(request, context);
+  return handler(request);
 }
 
 export { handler as POST };
