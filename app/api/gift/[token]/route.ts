@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
@@ -7,6 +7,7 @@ export async function GET(
   _request: Request,
   { params }: { params: { token: string } }
 ) {
+  const supabase = getSupabase();
   const token = params.token;
 
   const { data, error } = await supabase

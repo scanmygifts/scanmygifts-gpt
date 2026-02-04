@@ -14,7 +14,7 @@ import {
   scheduleSchema,
 } from "@/lib/validation";
 import { deliveryId, giftId, giftToken, mediaId } from "@/lib/ids";
-import { publicBaseUrl, storageBucket, supabase } from "@/lib/supabase";
+import { getPublicBaseUrl, getStorageBucket, getSupabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
@@ -27,6 +27,9 @@ const widgetHtml = readFileSync(
 const handler = createMcpHandler(
   (server) => {
     const mcpServer = server as McpServer;
+    const supabase = getSupabase();
+    const publicBaseUrl = getPublicBaseUrl();
+    const storageBucket = getStorageBucket();
 
     registerAppResource(
       mcpServer,
