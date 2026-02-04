@@ -1,4 +1,4 @@
-create table if not exists gifts (
+create table if not exists gpt_gifts (
   id text primary key,
   token text unique not null,
   sender_name text not null,
@@ -12,9 +12,9 @@ create table if not exists gifts (
   created_at timestamptz not null default now()
 );
 
-create table if not exists media (
+create table if not exists gpt_media (
   id text primary key,
-  gift_id text not null references gifts(id) on delete cascade,
+  gift_id text not null references gpt_gifts(id) on delete cascade,
   kind text not null,
   mime_type text not null,
   storage_path text not null,
@@ -22,9 +22,9 @@ create table if not exists media (
   created_at timestamptz not null default now()
 );
 
-create table if not exists deliveries (
+create table if not exists gpt_deliveries (
   id text primary key,
-  gift_id text not null references gifts(id) on delete cascade,
+  gift_id text not null references gpt_gifts(id) on delete cascade,
   channel text not null,
   send_at timestamptz not null,
   status text not null,
@@ -32,13 +32,13 @@ create table if not exists deliveries (
   created_at timestamptz not null default now()
 );
 
-create table if not exists events (
+create table if not exists gpt_events (
   id bigserial primary key,
-  gift_id text not null references gifts(id) on delete cascade,
+  gift_id text not null references gpt_gifts(id) on delete cascade,
   type text not null,
   created_at timestamptz not null default now()
 );
 
-create index if not exists idx_gifts_token on gifts(token);
-create index if not exists idx_media_gift_id on media(gift_id);
-create index if not exists idx_deliveries_gift_id on deliveries(gift_id);
+create index if not exists idx_gpt_gifts_token on gpt_gifts(token);
+create index if not exists idx_gpt_media_gift_id on gpt_media(gift_id);
+create index if not exists idx_gpt_deliveries_gift_id on gpt_deliveries(gift_id);

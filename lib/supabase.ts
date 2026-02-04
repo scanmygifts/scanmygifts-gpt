@@ -18,7 +18,7 @@ export function getSupabase() {
 }
 
 export function getStorageBucket() {
-  return process.env.SUPABASE_STORAGE_BUCKET || "gift-media";
+  return process.env.SUPABASE_STORAGE_BUCKET || "gpt-gift-media";
 }
 
 export function getPublicBaseUrl() {

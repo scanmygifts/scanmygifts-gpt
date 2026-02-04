@@ -76,7 +76,7 @@ const handler = createMcpHandler(
         const shareUrl = `${publicBaseUrl}/gift/${token}`;
         const createdAt = new Date().toISOString();
 
-        const { error: giftError } = await supabase.from("gifts").insert({
+        const { error: giftError } = await supabase.from("gpt_gifts").insert({
           id,
           token,
           sender_name: payload.senderName,
@@ -104,7 +104,7 @@ const handler = createMcpHandler(
         };
 
         const { error: deliveryError } = await supabase
-          .from("deliveries")
+          .from("gpt_deliveries")
           .insert(delivery);
 
         if (deliveryError) {
@@ -170,7 +170,7 @@ const handler = createMcpHandler(
 
         const publicUrl = publicData.publicUrl;
 
-        const { error: mediaError } = await supabase.from("media").insert({
+        const { error: mediaError } = await supabase.from("gpt_media").insert({
           id,
           gift_id: payload.giftId,
           kind: payload.kind,
@@ -227,7 +227,7 @@ const handler = createMcpHandler(
           created_at: new Date().toISOString(),
         };
 
-        const { error } = await supabase.from("deliveries").insert(record);
+        const { error } = await supabase.from("gpt_deliveries").insert(record);
         if (error) {
           throw new Error(error.message);
         }
@@ -257,9 +257,9 @@ const handler = createMcpHandler(
       async (input) => {
         const payload = giftGetSchema.parse(input);
         const { data, error } = await supabase
-          .from("gifts")
+          .from("gpt_gifts")
           .select(
-            "id, sender_name, recipient_name, note, share_url, send_at, channel, token, media (id, kind, public_url, mime_type)"
+            "id, sender_name, recipient_name, note, share_url, send_at, channel, token, gpt_media (id, kind, public_url, mime_type)"
           )
           .eq("id", payload.giftId)
           .single();
@@ -275,7 +275,7 @@ const handler = createMcpHandler(
             senderName: data.sender_name,
             recipientName: data.recipient_name,
             note: data.note,
-            media: data.media,
+            media: data.gpt_media,
           },
           content: [{ type: "text", text: "Loaded gift details." }],
           _meta: { gift: data },

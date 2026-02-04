@@ -25,7 +25,7 @@ npm run dev
 
 4. Create your Supabase tables
 - Use `supabase/schema.sql`
-- Create a public storage bucket named `gift-media`
+- Create a public storage bucket named `gpt-gift-media`
 
 ## MCP Server Endpoint
 - `POST /api/mcp` (SSE / JSON-RPC transport)
@@ -49,7 +49,7 @@ Tables are defined in `supabase/schema.sql`:
 - `deliveries`
 - `events`
 
-Storage bucket: `gift-media` (public for MVP)
+Storage bucket: `gpt-gift-media` (public for MVP)
 
 ## Vercel Deployment
 1. Push this repo to GitHub.

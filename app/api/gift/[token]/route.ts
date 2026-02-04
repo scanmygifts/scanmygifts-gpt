@@ -11,9 +11,9 @@ export async function GET(
   const token = params.token;
 
   const { data, error } = await supabase
-    .from("gifts")
+    .from("gpt_gifts")
     .select(
-      "id, sender_name, recipient_name, note, share_url, send_at, channel, media (id, kind, public_url, mime_type)"
+      "id, sender_name, recipient_name, note, share_url, send_at, channel, gpt_media (id, kind, public_url, mime_type)"
     )
     .eq("token", token)
     .single();
@@ -22,5 +22,13 @@ export async function GET(
     return NextResponse.json({ error: "Gift not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ gift: data }, { status: 200 });
+  return NextResponse.json(
+    {
+      gift: {
+        ...data,
+        media: data.gpt_media ?? [],
+      },
+    },
+    { status: 200 }
+  );
 }
