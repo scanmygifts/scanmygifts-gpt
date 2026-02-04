@@ -28,8 +28,9 @@ npm run dev
 - Create a public storage bucket named `gpt-gift-media`
 
 ## MCP Server Endpoint
-- `POST /api/mcp` (SSE / JSON-RPC transport)
-- The route lives at `app/api/mcp/[transport]/route.ts`
+- Streamable HTTP: `POST /api/mcp`
+- SSE transport: `GET /api/sse`
+- The route lives at `app/api/[transport]/route.ts`
 
 ## ChatGPT App UI
 The UI widget is served from `public/widget/gift-widget.html` and loaded by ChatGPT using:
@@ -59,7 +60,8 @@ Storage bucket: `gpt-gift-media` (public for MVP)
    - `SUPABASE_STORAGE_BUCKET`
    - `PUBLIC_BASE_URL`
 3. Deploy. Your MCP endpoint will be:
-   - `https://YOUR_DOMAIN.vercel.app/api/mcp`
+   - `https://YOUR_DOMAIN.vercel.app/api/mcp` (streamable HTTP)
+   - `https://YOUR_DOMAIN.vercel.app/api/sse` (SSE)
 
 ## ChatGPT App Setup
 1. Enable Developer Mode in ChatGPT.
