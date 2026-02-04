@@ -61,7 +61,7 @@ const handler = createMcpHandler(
       "gift.create",
       {
         title: "Create Gift",
-        inputSchema: createGiftSchema,
+        inputSchema: createGiftSchema.shape,
         _meta: {
           ui: { resourceUri: WIDGET_URI },
         },
@@ -142,7 +142,7 @@ const handler = createMcpHandler(
       "media.create_upload_url",
       {
         title: "Create Media Upload URL",
-        inputSchema: createUploadSchema,
+        inputSchema: createUploadSchema.shape,
         _meta: {
           ui: { resourceUri: WIDGET_URI },
         },
@@ -208,7 +208,7 @@ const handler = createMcpHandler(
       "delivery.schedule",
       {
         title: "Schedule Delivery",
-        inputSchema: scheduleSchema,
+        inputSchema: scheduleSchema.shape,
         _meta: {
           ui: { resourceUri: WIDGET_URI },
         },
@@ -246,7 +246,7 @@ const handler = createMcpHandler(
       "gift.get",
       {
         title: "Get Gift",
-        inputSchema: giftGetSchema,
+        inputSchema: giftGetSchema.shape,
         _meta: {
           ui: { resourceUri: WIDGET_URI },
         },
