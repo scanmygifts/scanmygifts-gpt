@@ -80,11 +80,13 @@ const handler = createMcpHandler(
           id,
           token,
           sender_name: payload.senderName,
+          sender_contact: payload.senderContact,
           recipient_name: payload.recipientName,
           recipient_contact: payload.recipientContact,
           channel: payload.channel,
           send_at: payload.sendAt,
           timezone: payload.timezone ?? null,
+          occasion: payload.occasion ?? null,
           note: payload.note ?? null,
           share_url: shareUrl,
           created_at: createdAt,
@@ -130,10 +132,12 @@ const handler = createMcpHandler(
               id,
               token,
               shareUrl,
-              senderName: payload.senderName,
-              recipientName: payload.recipientName,
-              note: payload.note ?? null,
-            },
+            senderName: payload.senderName,
+            recipientName: payload.recipientName,
+            senderContact: payload.senderContact,
+            occasion: payload.occasion ?? null,
+            note: payload.note ?? null,
+          },
             delivery,
           },
         };
@@ -262,7 +266,7 @@ const handler = createMcpHandler(
         const { data, error } = await supabase
           .from("gpt_gifts")
           .select(
-            "id, sender_name, recipient_name, note, share_url, send_at, channel, token, gpt_media (id, kind, public_url, mime_type)"
+            "id, sender_name, sender_contact, recipient_name, recipient_contact, channel, note, occasion, share_url, send_at, token, gpt_media (id, kind, public_url, mime_type)"
           )
           .eq("id", payload.giftId)
           .single();
@@ -277,6 +281,10 @@ const handler = createMcpHandler(
             shareUrl: data.share_url,
             senderName: data.sender_name,
             recipientName: data.recipient_name,
+            senderContact: data.sender_contact,
+            recipientContact: data.recipient_contact,
+            channel: data.channel,
+            occasion: data.occasion,
             note: data.note,
             media: data.gpt_media,
           },

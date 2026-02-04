@@ -120,20 +120,28 @@
             <input id="senderName" placeholder="Ava" />
           </label>
           <label>
+            Sender contact
+            <input id="senderContact" placeholder="+1 555 123 4567 or ava@email.com" />
+          </label>
+          <label>
             Recipient name
             <input id="recipientName" placeholder="Jordan" />
           </label>
           <label>
-            Contact (SMS/WhatsApp/Email)
-            <input id="recipientContact" placeholder="+1 555 123 4567" />
+            Recipient contact
+            <input id="recipientContact" placeholder="+1 555 987 6543 or jordan@email.com" />
           </label>
           <label>
-            Channel
+            Contact method
             <select id="channel">
               <option value="sms">SMS</option>
               <option value="whatsapp">WhatsApp</option>
               <option value="email">Email</option>
             </select>
+          </label>
+          <label>
+            Occasion
+            <input id="occasion" placeholder="Birthday, Anniversary, Congrats" />
           </label>
           <label>
             Send time
@@ -160,10 +168,6 @@
 
           <div class="uploads">
             <label>
-              Gift image
-              <input id="imageUpload" type="file" accept="image/*" />
-            </label>
-            <label>
               Audio message
               <input id="audioUpload" type="file" accept="audio/*" />
             </label>
@@ -183,9 +187,11 @@
       const senderName = document.getElementById("senderName");
       const recipientName = document.getElementById("recipientName");
       const recipientContact = document.getElementById("recipientContact");
+      const senderContact = document.getElementById("senderContact");
       const channel = document.getElementById("channel");
       const sendAt = document.getElementById("sendAt");
       const timezone = document.getElementById("timezone");
+      const occasion = document.getElementById("occasion");
       const note = document.getElementById("note");
 
       let giftId = null;
@@ -215,6 +221,12 @@
         statusEl.style.color = isError ? "#991b1b" : "#92400e";
       }
 
+      function validateRequired(value, label) {
+        if (!value) {
+          throw new Error(`${label} is required`);
+        }
+      }
+
       async function callTool(name, args) {
         const response = await rpc("tools/call", { name, arguments: args });
         if (response?.error) {
@@ -225,13 +237,20 @@
 
       async function createGift() {
         setStatus("Creating gift link...");
+        validateRequired(senderName.value.trim(), "Sender name");
+        validateRequired(senderContact.value.trim(), "Sender contact");
+        validateRequired(recipientName.value.trim(), "Recipient name");
+        validateRequired(recipientContact.value.trim(), "Recipient contact");
+        validateRequired(sendAt.value, "Send time");
         const payload = {
           senderName: senderName.value.trim(),
+          senderContact: senderContact.value.trim(),
           recipientName: recipientName.value.trim(),
           recipientContact: recipientContact.value.trim(),
           channel: channel.value,
           sendAt: new Date(sendAt.value).toISOString(),
           timezone: timezone.value.trim() || undefined,
+          occasion: occasion.value.trim() || undefined,
           note: note.value.trim() || undefined,
         };
 
@@ -267,14 +286,6 @@
       document.getElementById("createGift").addEventListener("click", async () => {
         try {
           await createGift();
-        } catch (error) {
-          setStatus(error.message, true);
-        }
-      });
-
-      document.getElementById("imageUpload").addEventListener("change", async (event) => {
-        try {
-          await uploadFile(event.target.files[0], "image");
         } catch (error) {
           setStatus(error.message, true);
         }

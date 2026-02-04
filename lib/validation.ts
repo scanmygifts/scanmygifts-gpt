@@ -4,11 +4,13 @@ export const channelSchema = z.enum(["sms", "whatsapp", "email"]);
 
 export const createGiftSchema = z.object({
   senderName: z.string().min(1).max(80),
+  senderContact: z.string().min(3).max(200),
   recipientName: z.string().min(1).max(80),
   recipientContact: z.string().min(3).max(200),
   channel: channelSchema,
   sendAt: z.string().datetime(),
   timezone: z.string().min(2).max(64).optional(),
+  occasion: z.string().max(120).optional(),
   note: z.string().max(500).optional(),
 });
 

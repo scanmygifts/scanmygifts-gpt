@@ -12,11 +12,14 @@ type MediaItem = {
 type Gift = {
   id: string;
   sender_name: string;
+  sender_contact?: string | null;
   recipient_name: string;
+  recipient_contact?: string | null;
+  channel?: string | null;
+  occasion?: string | null;
   note: string | null;
   share_url: string;
   send_at: string;
-  channel: string;
   media: MediaItem[];
 };
 
@@ -88,8 +91,16 @@ export default function GiftPage({ params }: { params: { token: string } }) {
       >
         <h1 style={{ marginTop: 0 }}>Hi {gift.recipient_name}!</h1>
         <p style={{ fontSize: 18 }}>
-          {gift.sender_name} sent you a gift message.
+          {gift.sender_name} sent you a gift message
+          {gift.occasion ? ` for ${gift.occasion}` : ""}.
         </p>
+        {(gift.sender_contact || gift.recipient_contact) && (
+          <p style={{ marginTop: 4, color: "#64748b" }}>
+            {gift.sender_contact ? `From: ${gift.sender_contact}` : ""}
+            {gift.sender_contact && gift.recipient_contact ? " · " : ""}
+            {gift.recipient_contact ? `To: ${gift.recipient_contact}` : ""}
+          </p>
+        )}
         {heroMedia?.kind === "image" && (
           <img
             src={heroMedia.public_url}

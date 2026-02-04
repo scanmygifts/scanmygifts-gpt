@@ -13,7 +13,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("gpt_gifts")
     .select(
-      "id, sender_name, recipient_name, note, share_url, send_at, channel, gpt_media (id, kind, public_url, mime_type)"
+      "id, sender_name, sender_contact, recipient_name, recipient_contact, channel, note, occasion, share_url, send_at, gpt_media (id, kind, public_url, mime_type)"
     )
     .eq("token", token)
     .single();

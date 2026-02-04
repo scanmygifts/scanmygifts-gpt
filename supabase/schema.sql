@@ -2,11 +2,13 @@ create table if not exists gpt_gifts (
   id text primary key,
   token text unique not null,
   sender_name text not null,
+  sender_contact text,
   recipient_name text not null,
   recipient_contact text not null,
   channel text not null,
   send_at timestamptz not null,
   timezone text,
+  occasion text,
   note text,
   share_url text not null,
   created_at timestamptz not null default now()
