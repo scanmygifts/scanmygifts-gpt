@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GiftLink</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Trebuchet MS", "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 45%, #fca5a5 100%);
+        color: #1f2937;
+        min-height: 100vh;
+      }
+      .shell {
+        padding: 24px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 24px 60px rgba(30, 41, 59, 0.2);
+        display: grid;
+        gap: 20px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.03em;
+      }
+      p {
+        margin: 0;
+        color: #475569;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #64748b;
+      }
+      input,
+      select,
+      textarea {
+        font: inherit;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+      }
+      textarea {
+        min-height: 88px;
+      }
+      .button {
+        padding: 12px 16px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        background: #111827;
+        color: white;
+      }
+      .button.secondary {
+        background: #f1f5f9;
+        color: #1f2937;
+        border: 1px solid #e2e8f0;
+      }
+      .status {
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 14px;
+      }
+      .uploads {
+        display: grid;
+        gap: 12px;
+      }
+      .link {
+        font-size: 14px;
+        color: #0f172a;
+        word-break: break-all;
+        background: #f8fafc;
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="card">
+        <div>
+          <h1>Craft a gift moment</h1>
+          <p>Upload the gift photo, add a message, and schedule delivery.</p>
+        </div>
+
+        <div class="grid">
+          <label>
+            Sender name
+            <input id="senderName" placeholder="Ava" />
+          </label>
+          <label>
+            Recipient name
+            <input id="recipientName" placeholder="Jordan" />
+          </label>
+          <label>
+            Contact (SMS/WhatsApp/Email)
+            <input id="recipientContact" placeholder="+1 555 123 4567" />
+          </label>
+          <label>
+            Channel
+            <select id="channel">
+              <option value="sms">SMS</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="email">Email</option>
+            </select>
+          </label>
+          <label>
+            Send time
+            <input id="sendAt" type="datetime-local" />
+          </label>
+          <label>
+            Timezone
+            <input id="timezone" placeholder="America/Los_Angeles" />
+          </label>
+        </div>
+
+        <label>
+          Personal note
+          <textarea id="note" placeholder="I hope this brightens your day..."></textarea>
+        </label>
+
+        <div class="actions">
+          <button id="createGift" class="button">Create gift link</button>
+          <span id="status" class="status" hidden></span>
+        </div>
+
+        <div id="afterCreate" hidden>
+          <div class="link" id="shareUrl"></div>
+
+          <div class="uploads">
+            <label>
+              Gift image
+              <input id="imageUpload" type="file" accept="image/*" />
+            </label>
+            <label>
+              Audio message
+              <input id="audioUpload" type="file" accept="audio/*" />
+            </label>
+            <label>
+              Video message
+              <input id="videoUpload" type="file" accept="video/*" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      const statusEl = document.getElementById("status");
+      const afterCreateEl = document.getElementById("afterCreate");
+      const shareUrlEl = document.getElementById("shareUrl");
+      const senderName = document.getElementById("senderName");
+      const recipientName = document.getElementById("recipientName");
+      const recipientContact = document.getElementById("recipientContact");
+      const channel = document.getElementById("channel");
+      const sendAt = document.getElementById("sendAt");
+      const timezone = document.getElementById("timezone");
+      const note = document.getElementById("note");
+
+      let giftId = null;
+
+      const pending = new Map();
+      let rpcId = 1;
+
+      function rpc(method, params) {
+        const id = rpcId++;
+        const payload = { jsonrpc: "2.0", id, method, params };
+        window.parent.postMessage(payload, "*");
+        return new Promise((resolve, reject) => {
+          pending.set(id, { resolve, reject });
+          setTimeout(() => {
+            if (pending.has(id)) {
+              pending.delete(id);
+              reject(new Error("Request timed out"));
+            }
+          }, 30000);
+        });
+      }
+
+      function setStatus(message, isError = false) {
+        statusEl.hidden = false;
+        statusEl.textContent = message;
+        statusEl.style.background = isError ? "#fee2e2" : "#fef3c7";
+        statusEl.style.color = isError ? "#991b1b" : "#92400e";
+      }
+
+      async function callTool(name, args) {
+        const response = await rpc("tools/call", { name, arguments: args });
+        if (response?.error) {
+          throw new Error(response.error.message || "Tool call failed");
+        }
+        return response?.result ?? response;
+      }
+
+      async function createGift() {
+        setStatus("Creating gift link...");
+        const payload = {
+          senderName: senderName.value.trim(),
+          recipientName: recipientName.value.trim(),
+          recipientContact: recipientContact.value.trim(),
+          channel: channel.value,
+          sendAt: new Date(sendAt.value).toISOString(),
+          timezone: timezone.value.trim() || undefined,
+          note: note.value.trim() || undefined,
+        };
+
+        const result = await callTool("gift.create", payload);
+        const data = result?.structuredContent || result?._meta?.gift || {};
+        giftId = data.giftId || result?._meta?.gift?.id;
+        shareUrlEl.textContent = data.shareUrl || result?._meta?.gift?.shareUrl || "";
+        afterCreateEl.hidden = false;
+        setStatus("Gift link created. Upload media next.");
+      }
+
+      async function uploadFile(file, kind) {
+        if (!giftId || !file) return;
+        setStatus(`Preparing ${kind} upload...`);
+        const upload = await callTool("media.create_upload_url", {
+          giftId,
+          kind,
+          filename: file.name,
+          mimeType: file.type,
+        });
+        const signedUrl = upload?._meta?.upload?.signedUrl || upload?.structuredContent?.signedUrl;
+        if (!signedUrl) throw new Error("Missing signed URL");
+        await fetch(signedUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+        setStatus(`${kind} uploaded.`);
+      }
+
+      document.getElementById("createGift").addEventListener("click", async () => {
+        try {
+          await createGift();
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      document.getElementById("imageUpload").addEventListener("change", async (event) => {
+        try {
+          await uploadFile(event.target.files[0], "image");
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      document.getElementById("audioUpload").addEventListener("change", async (event) => {
+        try {
+          await uploadFile(event.target.files[0], "audio");
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      document.getElementById("videoUpload").addEventListener("change", async (event) => {
+        try {
+          await uploadFile(event.target.files[0], "video");
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      window.addEventListener("message", (event) => {
+        const message = event.data;
+        if (!message || message.jsonrpc !== "2.0") return;
+
+        if (message.method === "ui/initialize") {
+          return;
+        }
+
+        if (message.id && pending.has(message.id)) {
+          const { resolve, reject } = pending.get(message.id);
+          pending.delete(message.id);
+          if (message.error) {
+            reject(new Error(message.error.message));
+          } else {
+            resolve(message.result ?? message);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
