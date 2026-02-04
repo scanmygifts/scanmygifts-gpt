@@ -289,33 +289,10 @@ const handler = createMcpHandler(
   },
   {},
   {
+    redisUrl: process.env.REDIS_URL,
     basePath: "/api",
     maxDuration: 60,
   }
 );
 
-export async function GET(
-  request: Request,
-  context: { params: { transport: string } }
-) {
-  if (context.params.transport === "mcp") {
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(encoder.encode(": ok\n\n"));
-        controller.close();
-      },
-    });
-    return new Response(stream, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    });
-  }
-  return handler(request);
-}
-
-export { handler as POST };
+export { handler as GET, handler as POST };
