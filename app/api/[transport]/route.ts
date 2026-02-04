@@ -60,9 +60,29 @@ const handler = createMcpHandler(
 
     registerAppTool(
       mcpServer,
+      "gift.compose",
+      {
+        title: "Open Gift Composer",
+        description:
+          "Open the ScanMyGifts UI to collect sender/recipient details and uploads. Use this whenever the user wants to create a gift link, even if details are missing.",
+        inputSchema: {},
+        _meta: {
+          ui: { resourceUri: WIDGET_URI },
+        },
+      },
+      async () => ({
+        content: [{ type: "text", text: "Opening the gift composer." }],
+        _meta: { ui: { resourceUri: WIDGET_URI } },
+      })
+    );
+
+    registerAppTool(
+      mcpServer,
       "gift.create",
       {
         title: "Create Gift",
+        description:
+          "Create a gift once all required fields are collected in the UI. Avoid calling this until the form is complete.",
         inputSchema: createGiftSchema.shape,
         _meta: {
           ui: { resourceUri: WIDGET_URI },
