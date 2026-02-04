@@ -63,6 +63,8 @@ Storage bucket: `gpt-gift-media` (public for MVP)
    - `https://YOUR_DOMAIN.vercel.app/api/mcp` (streamable HTTP, recommended)
    - `https://YOUR_DOMAIN.vercel.app/api/sse` (SSE, requires Redis on Vercel)
 
+If ChatGPT requires `text/event-stream`, use the SSE URL and set `REDIS_URL`.
+
 ## ChatGPT App Setup
 1. Enable Developer Mode in ChatGPT.
 2. Add your MCP server endpoint: `https://YOUR_DOMAIN.vercel.app/api/mcp`.
